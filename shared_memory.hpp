@@ -7,16 +7,14 @@
 
 class shared_memory
 {
-private:
-
+public:
 	std::string name;
 	bool is_valid = false;
 
-	// Internal
+protected:
+
 	HANDLE hMapFile;
 	LPCTSTR pBuf;
-
-public:
 
 	enum create_shared_memory_result
 	{
@@ -66,6 +64,8 @@ public:
 
 		return true;
 	}
+
+public:
 
 	shared_memory(const std::string name, DWORD size = 1024) : name(name)
 	{

@@ -18,12 +18,11 @@ int main()
 	test x { 1,2 };
 	
 	// P1
+    // Same as bsm<test> mem("youpi"); mem=x;
 	bound_shared_memory<test> mem("youpi", x);
 	
 	// P2
 	bound_shared_memory<test> men("youpi");
-
-
 	mem->a = 10;
 	std::cout << men->a << std::endl;
 
