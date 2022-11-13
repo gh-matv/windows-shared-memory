@@ -1,7 +1,7 @@
-#include <iostream>
+#include <stdio.h>
 
-#include "SharedMemory.hpp"
 #include "Windows.h" // For Sleep()
+#include "c_shared_memory_header_only.h"
 
 typedef struct A
 {
@@ -11,16 +11,18 @@ typedef struct A
 
 int main()
 {
-	SharedMemory<A> memory("test");
-	if (!memory.isValid())
+	c_shared_memory* memory = c_shared_memory_create("test", sizeof(A));
+	if (memory == NULL)
 	{
-		std::cout << "Failed to create shared memory: " << getLastErrorAsString() << std::endl;
+		char buffer[1024];
+		get_last_error_as_string(buffer, sizeof(buffer));
+		printf("Failed to create shared memory: %s", buffer);
 		return 1;
 	}
 
-	if (memory.isOriginator())
+	if (c_shared_memory_is_originator(memory))
 	{
-		A* data = memory.get();
+		A* data = (A*)c_shared_memory_get(memory);
 		data->a = 1;
 		data->b = 2;
 		printf("Originator: Set data to %d, %d\n", data->a, data->b);
@@ -30,12 +32,14 @@ int main()
 	}
 	else
 	{
-		A* data = memory.get();
+		A* data = (A*)c_shared_memory_get(memory);
 		printf("Accessor: Got data %d, %d\n", data->a, data->b);
 		A new_data = {3, 4};
 		*data = new_data; // other way to set data
 		printf("Accessor: Set data to %d, %d\n", data->a, data->b);
 	}
+
+	c_shared_memory_destroy(memory);
 
 	return 0;
 }
